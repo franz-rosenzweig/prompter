@@ -1,0 +1,46 @@
+# XcodeGen spec. Generates Prompter.xcodeproj from this file plus the Swift sources:
+#   xcodegen generate && open Prompter.xcodeproj
+# build.sh reads the same settings and builds without Xcode.
+name: Prompter
+options:
+  bundleIdPrefix: xyz.tiresia
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+targets:
+  Prompter:
+    type: application
+    platform: macOS
+    scheme:
+      configVariants: []
+    sources:
+      - path: Prompter
+    settings:
+      base:
+        PRODUCT_NAME: Prompter
+        PRODUCT_BUNDLE_IDENTIFIER: xyz.tiresia.prompter
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.9"
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+        COMBINE_HIDPI_IMAGES: YES
+    info:
+      path: Prompter/Info.plist
+      properties:
+        CFBundleName: Prompter
+        CFBundleDisplayName: Prompter
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSMinimumSystemVersion: "15.0"
+        LSApplicationCategoryType: public.app-category.productivity
+        NSHumanReadableCopyright: ""
+        NSPrincipalClass: NSApplication
+        NSMicrophoneUsageDescription: Prompter listens so the script can follow your voice.
+        NSSpeechRecognitionUsageDescription: Prompter matches what you say to the script, on this Mac.
+    entitlements:
+      path: Prompter/Prompter.entitlements
+      properties:
+        # Sandbox off: a personal app. The hardened runtime needs the microphone named.
+        com.apple.security.app-sandbox: false
+        com.apple.security.device.audio-input: true

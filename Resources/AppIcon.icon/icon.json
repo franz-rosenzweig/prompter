@@ -1,0 +1,24 @@
+{
+  "fill": {
+    "automatic-gradient": "extended-srgb:0.80000,0.84706,0.92157,1.00000"
+  },
+  "groups": [
+    {
+      "layers": [
+        { "image-name": "lines.svg", "name": "lines" }
+      ],
+      "shadow": { "kind": "neutral", "opacity": 0.2 },
+      "translucency": { "enabled": false, "value": 0 }
+    },
+    {
+      "layers": [
+        { "image-name": "tab.svg", "name": "tab" }
+      ],
+      "shadow": { "kind": "neutral", "opacity": 0.45 },
+      "translucency": { "enabled": false, "value": 0 }
+    }
+  ],
+  "supported-platforms": {
+    "squares": "shared"
+  }
+}
