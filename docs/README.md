@@ -4,14 +4,14 @@
 
 These pages explain how Prompter works. It's a teleprompter for the Mac that hangs from the top of the screen,
 right under the camera, so you can read your notes and still look people in the eye, and it scrolls by following
-what you say. If you're new, read "What is Prompter?" first and then Install, which gets it built and onto your Mac
-in a couple of minutes. The pages under "Using Prompter" go from writing a script to reading it on a call. The ones
+what you say. If you're new, read "What is Prompter?" first and then Install, which gets it onto your Mac in a couple
+of minutes. The pages under "Using Prompter" go from writing a script to reading it on a call. The ones
 at the bottom are for building your own copy and working on the code.
 
 ### Getting started
 - [What is Prompter?](what-is-prompter.md) — what it does, the three places you'll find it, and what it needs
 - [Why I made it](why-i-made-it.md) — the problem it solves, and what I left out on purpose
-- [Install](install.md) — building it, putting it in Applications, and the two permissions it asks for
+- [Install](install.md) — downloading it or building it, the first open, and the two permissions it asks for
 
 ### Using Prompter
 - [Writing a script](scripts.md) — the scripts window, cues, notes to yourself, and where the files live

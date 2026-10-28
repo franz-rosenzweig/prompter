@@ -19,7 +19,8 @@ it scrolls, and how it's tested.
 | `Prompter/SettingsView.swift`, `Prefs.swift` | Settings, and every setting's key and default |
 | `Prompter/SelfTest.swift` | The self-test's checks, and the switches the pictures use |
 | `project.yml`, `build.sh` | The XcodeGen spec, and the build that reads it |
-| `selftest.sh`, `tools/` | The tests, and the scripts that make the pictures in `docs/images` |
+| `selftest.sh`, `tools/pictures*` | The tests, and the scripts that make the pictures in `docs/images` |
+| `tools/dmg.sh`, `tools/dmg/` | The DMG: the build, its checks, and the window's layout and background |
 | `Resources/AppIcon.icon` | The icon, as Icon Composer makes them, so macOS 26 and later draw it light, dark or tinted |
 
 ## How Follow matches your words
@@ -101,6 +102,27 @@ Any setting can also be given at launch the same way, like `-mode steady` or `-f
 them out into `docs/images`, shooting `tools/pictures/compose.html` with headless Chromium for the pictures of the
 whole Mac. It needs Chromium, `cwebp` and ImageMagick. Everything in those pictures is drawn except the prompter,
 which is the app's own capture, and the people on the call are made up.
+
+## Releasing
+
+1. Set the version, `MARKETING_VERSION` in `project.yml`, and raise `CURRENT_PROJECT_VERSION` by one. Commit and
+   push.
+2. `tools/dmg.sh` builds `build/release/Prompter-X.Y.Z.dmg` from the committed code. It refuses if the app's code
+   has uncommitted changes. It checks the app before packing it: the signature and who signed it, no team, the
+   hardened runtime, the microphone entitlement, both architectures, the Info.plist, no home-folder paths,
+   addresses or emails, and the self-test under arm64 and under x86_64 (through Rosetta). Then it checks the DMG
+   the way someone opening it would find it.
+3. Publish it under the plain name `Prompter.dmg`, so the download links in the README, the docs and the about
+   page always get the newest one:
+
+```bash
+cp build/release/Prompter-X.Y.Z.dmg build/release/Prompter.dmg
+gh release create vX.Y.Z build/release/Prompter.dmg --title "Prompter X.Y.Z" --notes "…"
+```
+
+The Finder on macOS 26 and later shows its toolbar, path bar and status bar on a DMG's window whatever the DMG
+asks, so the background keeps the words and the icons in its top 300 points. And dmgbuild's `hide_extensions` is
+left out on purpose: it marks the app's folder in a way `codesign --strict` rejects.
 
 ## What a machine can't test
 

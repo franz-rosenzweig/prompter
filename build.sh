@@ -16,7 +16,7 @@ VERSION=$(setting MARKETING_VERSION)
 BUILD=$(setting CURRENT_PROJECT_VERSION)
 MACOS=$(setting macOS)
 SDK=$(xcrun --show-sdk-path)
-TARGET="$(uname -m)-apple-macos$MACOS"
+ARCHS=(${=PROMPTER_ARCHS:-$(uname -m)})   # "arm64 x86_64" for a universal app (tools/dmg.sh)
 
 OUT=${PROMPTER_OUT:-build}
 APP=$OUT/Prompter.app
@@ -28,8 +28,13 @@ rm -rf $APP && mkdir -p $APP/Contents/MacOS $APP/Contents/Resources
 # survive a rebuild; ad hoc otherwise, and macOS asks again after each build.
 IDENTITY=${PROMPTER_SIGN:-$(security find-identity -v -p codesigning | sed -n 's/^ *[0-9]*) \([0-9A-F]*\) "Apple Development.*/\1/p' | head -1)}
 
-swiftc -O -wmo -sdk $SDK -target $TARGET -swift-version 5 -parse-as-library \
-    -module-name Prompter Prompter/*.swift -o $APP/Contents/MacOS/Prompter
+# one compile per architecture, joined into one binary; source paths are kept out of it
+for arch in $ARCHS; do
+    swiftc -O -wmo -sdk $SDK -target $arch-apple-macos$MACOS -swift-version 5 -parse-as-library \
+        -file-prefix-map "$PWD=." -module-name Prompter Prompter/*.swift -o $OUT/Prompter-$arch
+done
+lipo -create $OUT/Prompter-${^ARCHS} -output $APP/Contents/MacOS/Prompter
+rm -f $OUT/Prompter-${^ARCHS}
 
 sed -e "s/\$(DEVELOPMENT_LANGUAGE)/en/" -e "s/\$(EXECUTABLE_NAME)/Prompter/" -e "s/\$(PRODUCT_NAME)/Prompter/" \
     -e "s/\$(PRODUCT_BUNDLE_IDENTIFIER)/$BUNDLE_ID/" -e "s/\$(MARKETING_VERSION)/$VERSION/" \
@@ -49,6 +54,8 @@ else
     echo "note: no actool (it comes with Xcode), so no icon"
 fi
 
-codesign --force --options runtime --entitlements Prompter/Prompter.entitlements --sign "${IDENTITY:--}" $APP
+# PROMPTER_KEYCHAIN: a keychain of its own holding the identity, as tools/dmg.sh uses
+codesign --force --options runtime --entitlements Prompter/Prompter.entitlements \
+    ${PROMPTER_KEYCHAIN:+--keychain $PROMPTER_KEYCHAIN} --sign "${IDENTITY:--}" $APP
 [[ -n $IDENTITY && $IDENTITY != - ]] || echo "note: signed ad hoc; macOS asks for the microphone again after each build"
 echo "built $APP"

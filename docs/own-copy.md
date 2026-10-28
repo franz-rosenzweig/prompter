@@ -20,9 +20,12 @@ PROMPTER_SIGN="Apple Development: you@example.com (ABCDE12345)" ./build.sh
 PROMPTER_SIGN=- ./build.sh     # ad hoc
 ```
 
-A build signed this way runs on your own Mac. To hand a copy to someone else so that it opens without warnings, it
-would need a Developer ID certificate and Apple's notarization, which `build.sh` doesn't do. The easiest way to
-share it is to send them here so they can build it themselves.
+A build signed this way runs on your own Mac. To make a copy to hand to someone else, `tools/dmg.sh` builds a
+universal app (Apple silicon and Intel) into a DMG with the Applications folder beside it, signed with the identity
+named in `~/.config/prompter-release.env` (the top of the script says what goes in it), or ad hoc with `--adhoc`.
+Either way it isn't notarized, so the first time it opens it goes through **Open Anyway**, as [Install](install.md)
+describes. Opening without that needs a Developer ID certificate and Apple's notarization, which need a paid Apple
+Developer account.
 
 ## Your own name and id
 

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prompter DMG background</title>
+<!-- The DMG window's background, 660x440. The Finder draws the two icons on it, at (165, 196) and
+     (495, 196) as settings.py places them, with their names under them. Everything that matters is in the
+     top 300 points: the Finder on macOS 26 and later shows its toolbar, path bar and status bar on a DMG's
+     window even when told not to, and they cover the bottom. dmg.sh shoots this at 1x and 2x. -->
+<style>
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 660px; height: 440px; overflow: hidden; }
+body { font-family: -apple-system, system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #1d2030;
+  background:
+    radial-gradient(60% 70% at 100% 100%, rgba(255,179,199,.45), transparent 70%),
+    radial-gradient(70% 80% at 0% 0%, rgba(154,123,240,.35), transparent 70%),
+    linear-gradient(160deg, #e9eafc, #f4f1fd); }
+.notch { position: absolute; top: 0; left: 50%; width: 150px; height: 26px; margin-left: -75px; background: #000;
+  border-radius: 0 0 14px 14px; }
+.notch::before, .notch::after { content: ""; position: absolute; top: 0; width: 8px; height: 8px; }
+.notch::before { left: -8px; background: radial-gradient(circle at 0 100%, transparent 7.6px, #000 8px); }
+.notch::after { right: -8px; background: radial-gradient(circle at 100% 100%, transparent 7.6px, #000 8px); }
+.notch i { position: absolute; top: 9px; left: 18px; right: 18px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.9); }
+.notch i + i { top: 15px; right: 44px; background: rgba(255,255,255,.4); }
+svg.arrow { position: absolute; left: 248px; top: 171px; width: 164px; height: 50px; }
+h1 { position: absolute; top: 44px; left: 0; right: 0; text-align: center; font-size: 17px; font-weight: 650; letter-spacing: -.01em; }
+p { position: absolute; top: 72px; left: 60px; right: 60px; text-align: center; font-size: 12px; line-height: 1.45; color: #5d6275; }
+p b { color: #3d4155; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="notch"><i></i><i></i></div>
+<svg class="arrow" viewBox="0 0 164 50" fill="none" stroke="#5B5BD6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 30 C 50 6, 110 6, 152 26" stroke-dasharray="2 9"/>
+  <path d="M140 14 L154 27 L136 34"/>
+</svg>
+<h1>Drag Prompter into Applications</h1>
+<p>The first time, macOS may say it can't check it. Open it from<br><b>System Settings › Privacy &amp; Security › Open Anyway</b>.</p>
+</body>
+</html>

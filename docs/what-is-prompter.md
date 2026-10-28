@@ -34,7 +34,7 @@ Follow is where it starts. [Follow, Voice and Steady](modes.md) explains all thr
 
 ## What it needs
 
-- A Mac with macOS 15 or later. The notch is nice but not needed. On a screen without one (an iMac, or an
+- A Mac with macOS 15 or later, Apple silicon or Intel. The notch is nice but not needed. On a screen without one (an iMac, or an
   external display), it hangs from the top centre the same way.
 - The microphone, for Follow and Voice, and speech recognition, for Follow. macOS asks the first time.
 - Nothing else. There's no account and no server, and your scripts are plain text files on your Mac.

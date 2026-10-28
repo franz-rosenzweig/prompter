@@ -9,8 +9,10 @@
   <img src="https://img.shields.io/badge/speech-on%20device-5B5BD6?style=flat-square" alt="Speech recognition on device">
   <img src="https://img.shields.io/badge/screen%20share-hidden-5B5BD6?style=flat-square" alt="Hidden from screen share">
   <img src="https://img.shields.io/badge/license-MIT-5B5BD6?style=flat-square" alt="MIT license">
+  <img src="https://img.shields.io/github/v/release/franz-rosenzweig/prompter?style=flat-square&color=5B5BD6&label=download" alt="The latest release">
 </p>
 <p align="center">
+  <a href="https://github.com/franz-rosenzweig/prompter/releases/latest/download/Prompter.dmg"><b>Download</b></a> ·
   <a href="https://docs.tiresia.xyz/prompter/"><b>Docs</b></a> ·
   <a href="#features">Features</a> ·
   <a href="#pictures">Pictures</a> ·
@@ -101,10 +103,16 @@ in the cloud.
 
 ## Install
 
-There's no download yet, and nothing to host: Prompter is a Mac app with no server behind it, so your own copy is
-the one you build. It takes about a minute.
+**[Download Prompter for Mac](https://github.com/franz-rosenzweig/prompter/releases/latest/download/Prompter.dmg)**, open it, and drag Prompter into Applications. It runs on macOS 15 or
+later, on Apple silicon and Intel Macs. There's nothing to host: it's a Mac app with no server behind it.
 
-You need macOS 15 or later, the Xcode Command Line Tools (`xcode-select --install`) and
+It's signed with my own identity rather than one Apple has checked, so the first time you open it, macOS says it
+can't check it. Click **Done**, then go to System Settings › Privacy & Security, scroll down to where it says
+Prompter was blocked, and click **Open Anyway**. You only do that once.
+
+### Or build it yourself
+
+It takes about a minute. You need the Xcode Command Line Tools (`xcode-select --install`) and
 [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`). Xcode itself is only needed for the
 icon.
 
@@ -117,13 +125,14 @@ open /Applications/Prompter.app
 ```
 
 Pick a script, press **Start** (⌘Return), and say yes when macOS asks for the microphone and speech recognition.
-[Install](https://docs.tiresia.xyz/prompter/install/) in the docs covers signing, updating and removing it.
+[Install](https://docs.tiresia.xyz/prompter/install/) in the docs covers updating and removing it.
 
 ## Build and test
 
 ```bash
 ./build.sh          # build/Prompter.app, signed with your Apple Development certificate if you have one
 ./selftest.sh       # the parser, Follow's matcher, pictures of the prompter, and the screen-share check
+tools/dmg.sh        # build/release/Prompter-X.Y.Z.dmg: universal, checked, and laid out for dragging in
 xcodegen generate   # Prompter.xcodeproj, if you'd rather work in Xcode
 ```
 

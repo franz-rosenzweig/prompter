@@ -2,6 +2,11 @@
 
 # Troubleshooting
 
+## macOS says it can't check Prompter
+
+That's the first time you open a downloaded copy. Click **Done**, then go to System Settings › Privacy & Security,
+scroll down to where it says Prompter was blocked, and click **Open Anyway**. [Install](install.md) explains why.
+
 ## Follow doesn't move
 
 - **Is it paused?** A small pause sign at the top right means it is. Hovering over the prompter also pauses it, so
