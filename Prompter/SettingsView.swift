@@ -2,11 +2,13 @@ import SwiftUI
 import Speech
 
 struct SettingsView: View {
+    @State private var tab = UserDefaults.standard.integer(forKey: "SelfTestSettingsTab")   // 0 unless a test picks one
+
     var body: some View {
-        TabView {
-            Tab("Prompter", systemImage: "rectangle.topthird.inset.filled") { LookSettings() }
-            Tab("Voice", systemImage: "waveform") { VoiceSettings() }
-            Tab("Shortcuts", systemImage: "command") { ShortcutSettings() }
+        TabView(selection: $tab) {
+            Tab("Prompter", systemImage: "rectangle.topthird.inset.filled", value: 0) { LookSettings() }
+            Tab("Voice", systemImage: "waveform", value: 1) { VoiceSettings() }
+            Tab("Shortcuts", systemImage: "command", value: 2) { ShortcutSettings() }
         }
         .frame(width: 480, height: 560)
     }
@@ -33,10 +35,8 @@ private struct LookSettings: View {
                     Text("Automatic").tag("")
                     ForEach(NSScreen.screens.map(\.localizedName), id: \.self) { Text($0).tag($0) }
                 }
-                if placement == Placement.notch.rawValue {
-                    SliderRow(title: "Width", value: $width, range: 280...1000, step: 10, unit: "pt")
-                    SliderRow(title: "Height", value: $height, range: 60...420, step: 5, unit: "pt")
-                }
+                SliderRow(title: "Width", value: $width, range: 280...1000, step: 10, unit: "pt")
+                SliderRow(title: "Height", value: $height, range: 60...420, step: 5, unit: "pt")
             }
             Section {
                 SliderRow(title: "Text size", value: $fontSize, range: 14...64, step: 1, unit: "pt")

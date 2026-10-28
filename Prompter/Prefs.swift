@@ -87,6 +87,12 @@ extension NSScreen {
 
     /// The camera housing's size, or zero on a screen without one.
     var notchSize: NSSize {
+        // a test copy can pretend, for pictures taken on a screen without one: -PrompterFakeNotch 200x32
+        if ProcessInfo.processInfo.environment["PROMPTER_TEST"] != nil,
+           let fake = UserDefaults.standard.string(forKey: "PrompterFakeNotch")?.split(separator: "x").compactMap({ Double($0) }),
+           fake.count == 2 {
+            return NSSize(width: fake[0], height: fake[1])
+        }
         guard safeAreaInsets.top > 0, let l = auxiliaryTopLeftArea, let r = auxiliaryTopRightArea else { return .zero }
         return NSSize(width: frame.width - l.width - r.width, height: safeAreaInsets.top)
     }

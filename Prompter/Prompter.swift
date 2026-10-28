@@ -160,24 +160,24 @@ import Observation
     }
 
     /// Where the panel goes: hanging from the top edge, centred under the camera, or
-    /// wherever the floating window was left.
+    /// wherever the floating window was left. Width and Height size it either way.
     func place() {
         guard let panel, let view, let screen = NSScreen.forPrompter else { return }
         let d = Pref.d
         let textHeight = CGFloat(d.double(forKey: Pref.height))
         let mirrored = d.bool(forKey: Pref.mirror)
         if Placement(rawValue: d.string(forKey: Pref.placement) ?? "") == .floating {
-            var frame = NSRectFromString(d.string(forKey: Pref.floatingFrame) ?? "")
-            if frame.width < 160 || !NSScreen.screens.contains(where: { $0.visibleFrame.intersects(frame) }) {
-                let w = CGFloat(d.double(forKey: Pref.width)), h = textHeight + 30
+            let w = CGFloat(d.double(forKey: Pref.width)), h = textHeight + 30
+            let saved = NSRectFromString(d.string(forKey: Pref.floatingFrame) ?? "")
+            // keep the top-left corner where it was left, so a new size grows down and right
+            var frame = NSRect(x: saved.minX, y: saved.maxY - h, width: w, height: h)
+            if saved.width < 1 || !NSScreen.screens.contains(where: { $0.visibleFrame.intersects(frame) }) {
                 let v = screen.visibleFrame
                 frame = NSRect(x: v.midX - w / 2, y: v.maxY - h - 60, width: w, height: h)
             }
             view.configure(placement: .floating, topInset: 14, ear: 0, mirrored: mirrored)
-            panel.styleMask.insert(.resizable)
             panel.isMovable = true
             panel.hasShadow = true
-            panel.minSize = NSSize(width: 200, height: 90)
             panel.setFrame(frame, display: true)
         } else {
             let notch = screen.notchSize
@@ -187,7 +187,6 @@ import Observation
             let h = top + textHeight + 14
             let s = screen.frame
             view.configure(placement: .notch, topInset: top, ear: ear, mirrored: mirrored)
-            panel.styleMask.remove(.resizable)
             panel.isMovable = false
             panel.hasShadow = false
             panel.setFrame(NSRect(x: (s.midX - width / 2 - ear).rounded(), y: s.maxY - h, width: width + 2 * ear, height: h), display: true)
@@ -315,6 +314,8 @@ import Observation
     }
 
     private func hover(_ inside: Bool) {
+        // pictures shouldn't depend on where the pointer happens to be
+        if UserDefaults.standard.bool(forKey: "PrompterNoHover") { return }
         hovering = inside
         if !UserDefaults.standard.bool(forKey: "PrompterShowControls") { view?.showControls(inside) }
     }
@@ -420,6 +421,9 @@ import Observation
         jumpTarget = followTarget
         dimSpoken()
     }
+
+    /// For pictures: the dot lit, as if it heard talking.
+    func pretendHearing() { view?.setHearing(true) }
 
     var windowNumber: Int { panel?.windowNumber ?? 0 }
     var panelFrame: NSRect { panel?.frame ?? .zero }

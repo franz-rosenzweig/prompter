@@ -28,6 +28,10 @@ import Observation
             try? Library.sample.write(to: folder.appendingPathComponent("Sample.md"), atomically: true, encoding: .utf8)
         }
         reload()
+        // files dropped into the folder in the Finder show up when you come back to the app
+        NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated { Library.shared.reload() }
+        }
     }
 
     func reload() {

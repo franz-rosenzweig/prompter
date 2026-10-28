@@ -6,6 +6,12 @@ import AppKit
 @MainActor enum SelfTest {
     static func quietExitIfTesting() {
         guard ProcessInfo.processInfo.environment["PROMPTER_TEST"] != nil else { return }
+        // pictures in either look, whatever the Mac is set to: -PrompterAppearance light|dark
+        switch UserDefaults.standard.string(forKey: "PrompterAppearance") {
+        case "light": NSApp.appearance = NSAppearance(named: .aqua)
+        case "dark": NSApp.appearance = NSAppearance(named: .darkAqua)
+        default: break
+        }
         // a test copy that fails exits quietly, so no crash dialog lands on the screen
         NSSetUncaughtExceptionHandler { e in
             FileHandle.standardError.write("EXCEPTION \(e.name.rawValue): \(e.reason ?? "")\n".data(using: .utf8)!)
@@ -20,6 +26,7 @@ import AppKit
         let d = UserDefaults.standard
         if d.object(forKey: "PrompterCursor") != nil { p.pretendHeard(through: d.integer(forKey: "PrompterCursor")) }
         if d.bool(forKey: "PrompterPlay") && !p.isPlaying { p.playPause() }
+        if d.bool(forKey: "PrompterHearing") { p.pretendHearing() }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
             for w in NSApp.windows where !(w is PrompterPanel) { w.orderOut(nil) }
             let id = CGWindowID(p.windowNumber)

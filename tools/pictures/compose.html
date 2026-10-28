@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prompter pictures</title>
+<!--
+  Lays the real captures in build/pictures/raw out into the showcase pictures; compose.sh shoots it
+  with headless Chromium. ?scene=hero|share|cover &theme=light|dark. Everything here is drawn in CSS
+  except the prompter itself, which is the app's own capture.
+-->
+<style>
+:root {
+  --bg1: #eef0fb; --bg2: #ffffff; --edge: #c8ccd6; --ink: #1d2030; --muted: #5d6275;
+  --wall1: #5b5bd6; --wall2: #9a7bf0; --wall3: #ffb3c7;
+  --win: #1d1e24; --winbar: #2a2b33; --tile1: #2f3140; --tile2: #3a3550;
+  --menubar: rgba(255,255,255,.55); --menuink: #16171c;
+}
+.dark {
+  --bg1: #0c0e16; --bg2: #171a28; --edge: #3a3e4c; --ink: #eceef6; --muted: #a2a7ba;
+  --wall1: #24205a; --wall2: #4b3a8f; --wall3: #8a4f8f;
+  --menubar: rgba(20,20,30,.55); --menuink: #f2f2f6;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+body { font-family: -apple-system, system-ui, "SF Pro Text", sans-serif; -webkit-font-smoothing: antialiased;
+  background: radial-gradient(120% 90% at 50% 0%, var(--bg2), var(--bg1)); color: var(--ink); }
+
+/* a MacBook screen; --s is CSS px per screen point */
+.mac { position: absolute; border-radius: calc(var(--s) * 34px); background: #0a0a0c;
+  box-shadow: 0 0 0 calc(var(--s) * 3px) var(--edge), 0 40px 90px -30px rgba(20,20,60,.45); padding: calc(var(--s) * 16px); }
+.screen { position: relative; width: calc(var(--s) * 1470px); height: calc(var(--s) * 956px); overflow: hidden;
+  border-radius: calc(var(--s) * 20px) calc(var(--s) * 20px) 0 0;
+  background:
+    radial-gradient(60% 70% at 85% 95%, var(--wall3), transparent 70%),
+    radial-gradient(70% 80% at 10% 10%, var(--wall2), transparent 70%),
+    linear-gradient(160deg, var(--wall1), var(--wall2)); }
+.menubar { position: absolute; inset: 0 0 auto 0; height: calc(var(--s) * 32px); background: var(--menubar);
+  backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-between;
+  padding: 0 calc(var(--s) * 18px); font-size: calc(var(--s) * 13.5px); color: var(--menuink); }
+.menubar span { margin-right: calc(var(--s) * 18px); }
+.menubar b { font-weight: 700; }
+.menubar .right { display: flex; align-items: center; gap: calc(var(--s) * 16px); }
+.menubar .right span { margin: 0; }
+.glyph { display: inline-block; width: calc(var(--s) * 18px); height: calc(var(--s) * 11px); border: calc(var(--s) * 1.5px) solid currentColor;
+  border-radius: calc(var(--s) * 3px); position: relative; opacity: .85; }
+.glyph::after { content: ""; position: absolute; inset: calc(var(--s) * 1.5px) calc(var(--s) * 5px) calc(var(--s) * 1.5px) calc(var(--s) * 1.5px);
+  background: currentColor; border-radius: calc(var(--s) * 1px); }
+
+/* the prompter: the app's capture, flush with the top edge; the camera sits in its middle */
+.prompter { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: calc(var(--s) * 580px); z-index: 3; }
+.lens { position: absolute; top: calc(var(--s) * 12px); left: 50%; transform: translateX(-50%); width: calc(var(--s) * 9px); height: calc(var(--s) * 9px);
+  border-radius: 50%; background: radial-gradient(circle at 35% 35%, #3b4a6b, #0b0d14 60%); box-shadow: 0 0 0 calc(var(--s) * 1.5px) #1b1c22; z-index: 4; }
+
+/* a video call window */
+.call { position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--s) * 214px);
+  width: calc(var(--s) * 1180px); height: calc(var(--s) * 650px); background: var(--win); border-radius: calc(var(--s) * 16px);
+  box-shadow: 0 calc(var(--s) * 30px) calc(var(--s) * 80px) rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.08); overflow: hidden; }
+.call .bar { height: calc(var(--s) * 40px); display: flex; align-items: center; gap: calc(var(--s) * 8px); padding: 0 calc(var(--s) * 16px);
+  color: #c9cad3; font-size: calc(var(--s) * 13px); }
+.dots i { display: inline-block; width: calc(var(--s) * 12px); height: calc(var(--s) * 12px); border-radius: 50%; margin-right: calc(var(--s) * 7px); }
+.dots i:nth-child(1) { background: #ff5f57; } .dots i:nth-child(2) { background: #febc2e; } .dots i:nth-child(3) { background: #28c840; }
+.call .title { flex: 1; text-align: center; margin-right: calc(var(--s) * 60px); }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--s) * 10px); padding: 0 calc(var(--s) * 14px); height: calc(var(--s) * 520px); }
+.tile { border-radius: calc(var(--s) * 12px); position: relative; display: grid; place-items: center; overflow: hidden; }
+.tile .face { width: calc(var(--s) * 110px); height: calc(var(--s) * 110px); border-radius: 50%; display: grid; place-items: center;
+  font-size: calc(var(--s) * 40px); font-weight: 600; color: rgba(255,255,255,.92); }
+.tile .name { position: absolute; left: calc(var(--s) * 12px); bottom: calc(var(--s) * 10px); font-size: calc(var(--s) * 13px);
+  color: #fff; background: rgba(0,0,0,.35); padding: calc(var(--s) * 3px) calc(var(--s) * 9px); border-radius: calc(var(--s) * 7px); }
+.tile.talking { box-shadow: inset 0 0 0 calc(var(--s) * 3px) #5ad18a; }
+.controls { display: flex; justify-content: center; gap: calc(var(--s) * 14px); padding-top: calc(var(--s) * 18px); }
+.controls i { width: calc(var(--s) * 46px); height: calc(var(--s) * 46px); border-radius: 50%; background: #34353f; display: grid; place-items: center; }
+.controls i svg { width: 46%; height: 46%; fill: none; stroke: #e9e9f0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.controls i.leave { background: #e5484d; width: calc(var(--s) * 70px); border-radius: calc(var(--s) * 23px); }
+.controls i.on { background: #4b5bd6; }
+
+/* a slides window, for the share picture */
+.slides { position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--s) * 120px); width: calc(var(--s) * 1240px); height: calc(var(--s) * 780px);
+  background: #f5f5f7; border-radius: calc(var(--s) * 16px); overflow: hidden; box-shadow: 0 calc(var(--s) * 30px) calc(var(--s) * 80px) rgba(0,0,0,.4); }
+.slides .bar { height: calc(var(--s) * 44px); background: #e8e8ed; display: flex; align-items: center; padding: 0 calc(var(--s) * 16px); }
+.slide { position: absolute; inset: calc(var(--s) * 70px) calc(var(--s) * 60px) calc(var(--s) * 40px); border-radius: calc(var(--s) * 8px);
+  background: linear-gradient(140deg, #ffffff, #eef0ff); box-shadow: 0 2px 10px rgba(0,0,0,.08); padding: calc(var(--s) * 70px) calc(var(--s) * 80px); color: #1b1d2a; }
+.slide h3 { font-size: calc(var(--s) * 64px); letter-spacing: -.02em; }
+.slide p { font-size: calc(var(--s) * 30px); color: #59607a; margin-top: calc(var(--s) * 18px); }
+.slide ol { margin-top: calc(var(--s) * 40px); padding-left: calc(var(--s) * 40px); font-size: calc(var(--s) * 34px); line-height: 1.7; }
+
+/* the share picture's two halves */
+.pair { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 64px 56px 56px; }
+.half { position: relative; }
+.half h2 { font-size: 22px; font-weight: 650; letter-spacing: -.01em; margin-bottom: 4px; }
+.half p { font-size: 15px; color: var(--muted); margin-bottom: 22px; }
+.half .holder { position: relative; height: 420px; }
+.viewer { position: absolute; inset: 0; background: #16171d; border-radius: 16px; padding: 38px 16px 16px; box-shadow: 0 30px 70px -30px rgba(20,20,60,.5); }
+.viewer .vb { position: absolute; top: 12px; left: 16px; right: 16px; display: flex; align-items: center; gap: 8px; color: #b9bbc8; font-size: 12px; }
+.viewer .vb .pill { margin-left: auto; background: #4b5bd6; color: #fff; border-radius: 99px; padding: 2px 10px; font-weight: 600; }
+.viewer .stage { position: relative; height: 100%; border-radius: 8px; overflow: hidden; }
+</style>
+</head>
+<body>
+<script>
+const q = new URLSearchParams(location.search)
+const scene = q.get("scene") || "hero", theme = q.get("theme") || "light", raw = q.get("raw") || "../../build/pictures/raw/"
+if (theme === "dark") document.documentElement.classList.add("dark")
+
+const icon = {
+  mic: '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+  cam: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3z"/></svg>',
+  share: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M12 14V8M9 10.5l3-3 3 3M8 21h8"/></svg>',
+  leave: '<svg viewBox="0 0 24 24"><path d="M4 14c4-4 12-4 16 0l-2 3-3-1v-2c-2-.6-4-.6-6 0v2l-3 1z" fill="#fff" stroke="none"/></svg>',
+}
+
+function menubar(app) {
+  return `<div class="menubar"><div><span><b>${app}</b></span><span>File</span><span>Edit</span><span>View</span><span>Window</span><span>Help</span></div>
+    <div class="right"><span class="glyph"></span><span>Tue 9:41</span></div></div>`
+}
+
+function call(s) {
+  const people = [["AK", "#d9775b", "Ana", true], ["JM", "#4b9b8e", "Jon", false], ["SR", "#7a6fd0", "Sam", false], ["LT", "#c49a3a", "Lee", false]]
+  return `<div class="call"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">Weekly sync</span></div>
+    <div class="tiles">${people.map(([ini, c, name, talking]) => `<div class="tile ${talking ? "talking" : ""}"
+       style="background:linear-gradient(150deg, var(--tile1), var(--tile2))"><div class="face" style="background:${c}">${ini}</div>
+       <span class="name">${name}</span></div>`).join("")}</div>
+    <div class="controls"><i>${icon.mic}</i><i>${icon.cam}</i><i class="on">${icon.share}</i><i class="leave">${icon.leave}</i></div></div>`
+}
+
+function slides() {
+  return `<div class="slides"><div class="bar"><span class="dots"><i></i><i></i><i></i></span></div>
+    <div class="slide"><h3>The first week</h3><p>Where we lose people, and what we change</p>
+    <ol><li>One setup screen, not four</li><li>Pick what you read first</li><li>A real book on day one</li></ol></div></div>`
+}
+
+function mac({ s, left, top, app, content, prompter }) {
+  return `<div class="mac" style="--s:${s};left:${left}px;top:${top}px"><div class="screen">
+    ${menubar(app)}${content}
+    ${prompter ? `<img class="prompter" src="${raw}${prompter}.png" alt=""><span class="lens"></span>` : ""}
+  </div></div>`
+}
+
+if (scene === "hero" || scene === "cover") {
+  const W = innerWidth, H = innerHeight
+  const s = scene === "cover" ? 0.8 : 0.8
+  const screenW = 1470 * s + 32 * s
+  document.body.innerHTML = mac({ s, left: (W - screenW) / 2, top: scene === "cover" ? 46 : 40, app: "Call", content: call(s), prompter: "follow" })
+} else if (scene === "share") {
+  const s = 0.37
+  document.body.innerHTML = `<div class="pair">
+    <div class="half"><h2>On your screen</h2><p>The script, right under the camera.</p>
+      <div class="holder">${mac({ s, left: 0, top: 0, app: "Slides", content: slides(), prompter: "follow" })}</div></div>
+    <div class="half"><h2>In the screen share</h2><p>The same screen, and no prompter.</p>
+      <div class="holder"><div class="viewer"><div class="vb"><span>Weekly sync</span><span class="pill">You're sharing</span></div>
+        <div class="stage">${mac({ s: 0.34, left: 10, top: 6, app: "Slides", content: slides(), prompter: null }).replace('class="mac"', 'class="mac" data-in-share')}</div></div></div></div>
+  </div>`
+}
+</script>
+</body>
+</html>

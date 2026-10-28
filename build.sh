@@ -1,6 +1,7 @@
 #!/bin/zsh
-# Builds Prompter.app with the Command Line Tools alone, no Xcode needed:
-#   ./build.sh && ./install.sh
+# Builds Prompter.app with the Command Line Tools and XcodeGen (brew install xcodegen):
+#   ./build.sh && cp -R build/Prompter.app /Applications/
+# Xcode itself is only needed for the icon (actool); without it the app builds with the plain one.
 # The settings and Info.plist keys come from project.yml, the same spec the Xcode project
 # is generated from, so the two builds can't drift apart.
 set -euo pipefail
@@ -39,10 +40,14 @@ plutil -lint -s $APP/Contents/Info.plist
 
 # The icon, layered as Icon Composer makes them (Resources/AppIcon.icon), so macOS 26 draws it
 # as it draws its own, light, dark and tinted; actool also writes an .icns for older systems.
-xcrun actool Resources/AppIcon.icon --compile $APP/Contents/Resources --app-icon AppIcon \
-    --platform macosx --minimum-deployment-target $MACOS --output-partial-info-plist $OUT/assets-partial.plist >/dev/null
-plutil -replace CFBundleIconFile -string AppIcon $APP/Contents/Info.plist
-plutil -replace CFBundleIconName -string AppIcon $APP/Contents/Info.plist
+if xcrun -f actool >/dev/null 2>&1; then
+    xcrun actool Resources/AppIcon.icon --compile $APP/Contents/Resources --app-icon AppIcon \
+        --platform macosx --minimum-deployment-target $MACOS --output-partial-info-plist $OUT/assets-partial.plist >/dev/null
+    plutil -replace CFBundleIconFile -string AppIcon $APP/Contents/Info.plist
+    plutil -replace CFBundleIconName -string AppIcon $APP/Contents/Info.plist
+else
+    echo "note: no actool (it comes with Xcode), so no icon"
+fi
 
 codesign --force --options runtime --entitlements Prompter/Prompter.entitlements --sign "${IDENTITY:--}" $APP
 [[ -n $IDENTITY && $IDENTITY != - ]] || echo "note: signed ad hoc; macOS asks for the microphone again after each build"
