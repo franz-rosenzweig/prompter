@@ -43,11 +43,13 @@ sed -e "s/\$(DEVELOPMENT_LANGUAGE)/en/" -e "s/\$(EXECUTABLE_NAME)/Prompter/" -e 
 plutil -lint -s $APP/Contents/Info.plist
 ! grep -q '\$(' $APP/Contents/Info.plist || { echo "Info.plist still has an unfilled \$(…)" >&2; exit 1; }
 
-# The icon, layered as Icon Composer makes them (Resources/AppIcon.icon), so macOS 26 draws it
+# The icon, layered as Icon Composer makes them (Resources/AppIcon.icon; in the dark the black tab
+# sits on slate rather than on black), so macOS 26 draws it
 # as it draws its own, light, dark and tinted; actool also writes an .icns for older systems.
 if xcrun -f actool >/dev/null 2>&1; then
-    xcrun actool Resources/AppIcon.icon --compile $APP/Contents/Resources --app-icon AppIcon \
-        --platform macosx --minimum-deployment-target $MACOS --output-partial-info-plist $OUT/assets-partial.plist >/dev/null
+    # full paths: actool hands the work to a helper that may still be running from another build's folder
+    xcrun actool "$PWD/Resources/AppIcon.icon" --compile "${APP:a}/Contents/Resources" --app-icon AppIcon \
+        --platform macosx --minimum-deployment-target $MACOS --output-partial-info-plist "${OUT:a}/assets-partial.plist" >/dev/null
     plutil -replace CFBundleIconFile -string AppIcon $APP/Contents/Info.plist
     plutil -replace CFBundleIconName -string AppIcon $APP/Contents/Info.plist
 else
